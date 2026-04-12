@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+import pickle
 
 # 1. Configuración visual
 st.set_page_config(page_title="Churn Insight Platform", page_icon="🏦")
@@ -12,35 +13,21 @@ st.markdown("Herramienta de análisis de riesgo para clientes bancarios.")
 # 2. Cargar el modelo (Nombre de variable unificado: MODEL_PATH)
 MODEL_PATH = "modelo_Banco_churn.pkl"
 
-import streamlit as st
-import joblib
-import pandas as pd
-import numpy as np
-import os
-
-st.set_page_config(page_title="Churn Insight Platform", page_icon="🏦")
-st.title("🏦 Churn Insight: Predicción de Abandono")
-st.markdown("Herramienta de análisis de riesgo para clientes bancarios.")
-
-MODEL_PATH = "modelo_Banco_churn.pkl"
-
 @st.cache_resource
 def load_model():
     if os.path.exists(MODEL_PATH):
         try:
-            return joblib.load(MODEL_PATH)
+            with open(MODEL_PATH, 'rb') as f:
+                return pickle.load(f)
         except Exception as e:
             st.error(f"Error real: {type(e).__name__}: {e}")
             import traceback
-            st.code(traceback.format_exc())  # 👈 esto muestra el error completo
+            st.code(traceback.format_exc())
     else:
         st.error(f"❌ Archivo no encontrado: {MODEL_PATH}")
         st.write("Archivos en raíz:", os.listdir("."))
     return None
-
 pipe_xgb = load_model()
-
-# ... el resto de tu código queda exactamente igual ...
 
 # 3. Interfaz de usuario (Solo se muestra si el modelo cargó)
 if pipe_xgb is not None:
